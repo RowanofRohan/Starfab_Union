@@ -1,0 +1,121 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SC_HardSurface_Proxy_Mat
+  m_Shader: {fileID: 4800000, guid: 185a17bee662ac34ab4021246c46b277, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _FLIPGREENCHANNEL_ON
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BlendTex1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DDNAGlossmap1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DDNAGlossmap2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Detail1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Detail2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Diffuse1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Diffuse2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Specular1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Specular2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ddna1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ddna2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - GenKey__BlendTex1: 1
+    - GenKey__DDNAGlossmap1: 1
+    - GenKey__DDNAGlossmap2: 1
+    - GenKey__Detail1: 1
+    - GenKey__Detail2: 1
+    - GenKey__Diffuse1: 1
+    - GenKey__Diffuse2: 1
+    - GenKey__Specular1: 1
+    - GenKey__Specular2: 1
+    - GenKey__ddna1: 1
+    - GenKey__ddna2: 1
+    - _BlendColor1: 0
+    - _DetailTiling1: 1
+    - _DetailTiling2: 1
+    - _FlipGreenChannel: 1
+    - _GlossyReflections: 1
+    - _LayerTiling1: 1
+    - _LayerTiling2: 1
+    - _NormalStrength: 1
+    - _PrimaryTintGloss: 0.5
+    - _SecondaryTintGloss: 0.5
+    - _SpecularHighlights: 1
+    - _WearLevel: 0
+    - __dirty: 0
+    m_Colors:
+    - _DDNAColor: {r: 0.5, g: 0.5, b: 1, a: 1}
+    - _DDNAColor1: {r: 0.5, g: 0.5, b: 1, a: 1}
+    - _DDNAColor2: {r: 0.5, g: 0.5, b: 1, a: 1}
+    - _DecalColor: {r: 0.9490196, g: 0.5568628, b: 0.21176466, a: 0}
+    - _DetailColor1: {r: 0, g: 0, b: 0, a: 1}
+    - _DetailColor2: {r: 0, g: 0, b: 0, a: 1}
+    - _DiffuseColor: {r: 1, g: 1, b: 1, a: 0}
+    - _DiffuseColor1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _DiffuseColor2: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _Emission: {r: 0, g: 0, b: 0, a: 0}
+    - _PrimaryTintDiff: {r: 0, g: 0, b: 0, a: 1}
+    - _PrimaryTintSpec: {r: 1, g: 1, b: 1, a: 1}
+    - _SecondaryTintDiff: {r: 0, g: 0, b: 0, a: 1}
+    - _SecondaryTintSpec: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecularColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecularColor1: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecularColor2: {r: 0, g: 0, b: 0, a: 1}
+    - _UVScale1: {r: 0, g: 0, b: 0, a: 0}
+    - _UVScale2: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []

@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: aegs_idris_mtl_leather
+  m_Shader: {fileID: 4800000, guid: 861dc939daf756f48abaa16f8558b4ab, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _BLEND
+  - _DDNA
+  - _DECAL
+  - _DETAIL
+  - _DIFFUSE
+  - _FLIPGREENCHANNEL_ON
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Blend:
+        m_Texture: {fileID: 2800000, guid: 5eec34d40d608a644b7e6f24f32dd0ec, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DDNAGlossmap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Decal:
+        m_Texture: {fileID: 2800000, guid: 6a2a2adb31ddb014d807e4532d89b989, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Detail:
+        m_Texture: {fileID: 2800000, guid: 05c0b6c9335aa31469a835e464962c46, type: 3}
+        m_Scale: {x: 17, y: 17}
+        m_Offset: {x: 0, y: 0}
+    - _Diffuse:
+        m_Texture: {fileID: 2800000, guid: 6a2a2adb31ddb014d807e4532d89b989, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Disp:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Specular:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ddna:
+        m_Texture: {fileID: 2800000, guid: a5e950c9b0462bf409078ce2472b2299, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - GenKey__Blend: 1
+    - GenKey__DDNAGlossmap: 1
+    - GenKey__Decal: 1
+    - GenKey__Detail: 1
+    - GenKey__Diffuse: 1
+    - GenKey__Disp: 1
+    - GenKey__Specular: 1
+    - GenKey__ddna: 1
+    - _BlendFactor: 8.05369
+    - _BlendFalloff: 0.38613
+    - _BlendLayer2Glossiness: 0
+    - _DetailDiffuseScale: 0.5
+    - _DetailGlossScale: 0.5
+    - _FlipGreenChannel: 1
+    - _GlossyReflections: 1
+    - _Glow: 0
+    - _HeightBias: 0.5
+    - _NormalStrength: 1
+    - _POMDisplacement: 0
+    - _SpecularHighlights: 1
+    - _UseAlpha: 0
+    - __dirty: 0
+    m_Colors:
+    - _BaseColor: {r: 0.92156863, g: 0.9098039, b: 0.8901961, a: 1}
+    - _BlendColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BlendLayer2DiffuseColor: {r: 0, g: 0, b: 0, a: 0}
+    - _BlendLayer2SpecularColor: {r: 0, g: 0, b: 0, a: 0}
+    - _DDNAColor: {r: 0.5, g: 0.5, b: 1, a: 0.26666668}
+    - _DecalColor: {r: 0, g: 0, b: 0, a: 0}
+    - _DetailColor: {r: 0.9411765, g: 0.7333333, b: 1, a: 0.5019608}
+    - _DiffuseColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
+    - _DispColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecularColor: {r: 0.015996294, g: 0.015996294, b: 0.015996294, a: 1}
+  m_BuildTextureStacks: []
