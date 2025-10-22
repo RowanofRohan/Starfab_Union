@@ -13,10 +13,7 @@ MonoBehaviour:
   m_Name: Blend (Overlay)
   m_EditorClassIdentifier: 
   m_functionInfo: "// Made with Amplify Shader Editor v1.9.9.4\n// Available at the
-    Unity Asset Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=19904\nNode;AmplifyShaderEditor.SaturateNode,
-    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;7;448,64;Inherit;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.LerpOp,
-    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;6;240,-16;Inherit;False;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT;0;False;1;COLOR;0\nNode;AmplifyShaderEditor.BlendOpsNode,
-    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;5;-96,-16;Inherit;False;Overlay;True;3;0;COLOR;0,0,0,0;False;1;COLOR;0.7372549,0.7372549,0.7372549,0;False;2;FLOAT;1;False;1;COLOR;0\nNode;AmplifyShaderEditor.RelayNode,
+    Unity Asset Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=19904\nNode;AmplifyShaderEditor.RelayNode,
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;10;-64,112;Inherit;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.SaturateNode,
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;3;-336,448;Inherit;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionInput,
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;2;-608,336;Inherit;False;Alpha
@@ -35,8 +32,11 @@ MonoBehaviour:
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;8;-848,-16;Inherit;False;Source;5;1;True;1;0;COLOR;0,0,0,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.FunctionInput,
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;9;-848,96;Inherit;False;Destiny;5;2;True;1;0;COLOR;0.5,0.5,0.5,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.LinearToGammaNode,
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;14;-656,48;Inherit;False;0;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.LinearToGammaNode,
-    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;15;-656,176;Inherit;False;0;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput,
-    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;0;1312,-16;Inherit;False;True;-1;Output;0;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0\nWireConnection;7;0;6;0\nWireConnection;6;0;10;0\nWireConnection;6;1;5;0\nWireConnection;6;2;1;0\nWireConnection;5;0;11;0\nWireConnection;5;1;12;0\nWireConnection;10;0;12;0\nWireConnection;3;0;2;0\nWireConnection;1;0;2;0\nWireConnection;1;1;3;0\nWireConnection;16;0;4;0\nWireConnection;4;0;6;0\nWireConnection;4;1;7;0\nWireConnection;13;0;4;0\nWireConnection;13;1;16;0\nWireConnection;12;0;9;0\nWireConnection;12;1;15;0\nWireConnection;11;0;8;0\nWireConnection;11;1;14;0\nWireConnection;14;0;8;0\nWireConnection;15;0;9;0\nWireConnection;0;0;13;0\nASEEND*/\n//CHKSM=3613AA9793A554D61A4C06367884CAEA1848162B"
+    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;15;-656,176;Inherit;False;0;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.LerpOp,
+    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;6;240,-16;Inherit;False;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT;0;False;1;COLOR;0\nNode;AmplifyShaderEditor.SaturateNode,
+    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;7;448,64;Inherit;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.BlendOpsNode,
+    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;5;-96,-16;Inherit;False;Overlay;True;3;0;COLOR;0,0,0,0;False;1;COLOR;0.7372549,0.7372549,0.7372549,0;False;2;FLOAT;1;False;1;COLOR;0\nNode;AmplifyShaderEditor.FunctionOutput,
+    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;0;1312,-16;Inherit;False;True;-1;Output;0;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0\nWireConnection;10;0;12;0\nWireConnection;3;0;2;0\nWireConnection;1;0;2;0\nWireConnection;1;1;3;0\nWireConnection;16;0;4;0\nWireConnection;4;0;6;0\nWireConnection;4;1;7;0\nWireConnection;13;0;4;0\nWireConnection;13;1;16;0\nWireConnection;12;0;9;0\nWireConnection;12;1;15;0\nWireConnection;11;0;8;0\nWireConnection;11;1;14;0\nWireConnection;14;0;8;0\nWireConnection;15;0;9;0\nWireConnection;6;0;10;0\nWireConnection;6;1;5;0\nWireConnection;6;2;1;0\nWireConnection;7;0;6;0\nWireConnection;5;0;11;0\nWireConnection;5;1;12;0\nWireConnection;0;0;13;0\nASEEND*/\n//CHKSM=10E0AEDB60A4670BFD89C37E3B9A49F5A8ECA90A"
   m_functionName: 
   m_description: 
   m_additionalIncludes:

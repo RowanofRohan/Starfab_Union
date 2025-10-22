@@ -75,3 +75,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 Generated_Materials/*
 Imported_Files/*
+/Generated_Materials
+/Config
+/Generated_Materials

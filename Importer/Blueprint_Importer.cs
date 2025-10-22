@@ -30,6 +30,10 @@ using System.Xml.Linq;
 using BestHTTP.JSON;
 using UnityEditor.VersionControl;
 using Unity.Burst.CompilerServices;
+using TMPro;
+using UnityEditor.Profiling.Memory.Experimental;
+using UnityEngine.Analytics;
+using UnityEngine.Scripting;
 
 public class SCBPImporter : EditorWindow
 {
@@ -39,6 +43,8 @@ public class SCBPImporter : EditorWindow
     LightImportSettings lightImportSettings = new LightImportSettings();
     GlobalImportSettings globalImportSettings = new GlobalImportSettings();
     UnityEngine.Object blueprintSource = null;
+
+    UnityEngine.Object prefabSource = null;
 
     string configSaveLocation = "Assets/Starfab/Importer/Config.Json";
 
@@ -65,7 +71,10 @@ public class SCBPImporter : EditorWindow
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            var list = value as IList<T>;
+
+            serializer.Serialize(writer, list);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -117,7 +126,8 @@ public class SCBPImporter : EditorWindow
     {
         public bpContainer importedBlueprint { get; set; }
         public bool preferTIF { get; set; }
-        public bool overwrite { get; set; }
+        public bool overwriteTextures { get; set; }
+        public bool overwriteMaterials { get; set; }
         public GameObject targetObject { get; set; }
 
         public string assetSources { get; set; }
@@ -126,16 +136,23 @@ public class SCBPImporter : EditorWindow
         public string materialGenerationPath { get; set; }
         public string prefabGenerationPath { get; set; }
 
+        public string configFilePath { get; set; }
+
+        //[SerializeField]
+        //string prefabSourcePath { get; set; }
+
         public GlobalImportSettings()
         {
             importedBlueprint = null;
             preferTIF = true;
             targetObject = null;
-            overwrite = false;
+            overwriteTextures = false;
+            overwriteMaterials = false;
             assetSources = "";
-            assetDestination = "Assets/Starfab_Union/Imported_Files";
+            assetDestination = "Assets/Starfab_Union/Imported_Files/Data";
             materialGenerationPath = "Assets/Starfab_Union/Generated_Materials";
             prefabGenerationPath = "Assets/Starfab_Union/Generated_Prefabs";
+            configFilePath = "Assets/Starfab_Union/Config";
         }
     }
 
@@ -628,15 +645,15 @@ public class SCBPImporter : EditorWindow
     {
         //if (!SessionState.GetBool("SCBPEditorLoaded", false))
         //{
-            //try
-            //{
-                // SCBPImporterConfig config = JsonConvert.DeserializeObject<SCBPImporterConfig>(AssetDatabase.LoadAssetAtPath<TextAsset>(configSaveLocation).text);
-                // blueprintSource = config.blueprintSource;
-                // globalImportSettings = config.globalSettings;
-                // lightImportSettings = config.lightImportSettings;
-            //}
-            //catch { }
-            //SessionState.SetBool("SCBPEditorLoaded", true);
+        //try
+        //{
+        // SCBPImporterConfig config = JsonConvert.DeserializeObject<SCBPImporterConfig>(AssetDatabase.LoadAssetAtPath<TextAsset>(configSaveLocation).text);
+        // blueprintSource = config.blueprintSource;
+        // globalImportSettings = config.globalSettings;
+        // lightImportSettings = config.lightImportSettings;
+        //}
+        //catch { }
+        //SessionState.SetBool("SCBPEditorLoaded", true);
         //}
 
         //EditorGUI.BeginChangeCheck();
@@ -647,7 +664,8 @@ public class SCBPImporter : EditorWindow
         globalImportSettings.assetSources = EditorGUILayout.TextField("Asset Source Directory", globalImportSettings.assetSources);
         //globalImportSettings.assetDestination = EditorGUILayout.TextField("Asset Creation Directory", globalImportSettings.assetDestination);
         globalImportSettings.preferTIF = EditorGUILayout.Toggle("Prefer TIF files", globalImportSettings.preferTIF);
-        globalImportSettings.overwrite = EditorGUILayout.Toggle("Overwrite Existing Assets", globalImportSettings.overwrite);
+        globalImportSettings.overwriteTextures = EditorGUILayout.Toggle("Overwrite Existing Textures", globalImportSettings.overwriteTextures);
+        globalImportSettings.overwriteMaterials = EditorGUILayout.Toggle("Overwrite Existing Materials", globalImportSettings.overwriteMaterials);
 
         // if (EditorGUI.EndChangeCheck())
         // {
@@ -655,13 +673,13 @@ public class SCBPImporter : EditorWindow
         // }
 
         if (blueprintSource != null)
+        {
+            if (GUILayout.Button("Load Blueprint"))
             {
-                if (GUILayout.Button("Load Blueprint"))
-                {
-                    globalImportSettings.importedBlueprint = ImportBlueprint(blueprintSource);
-                    availableLights = null;
-                }
+                globalImportSettings.importedBlueprint = ImportBlueprint(blueprintSource);
+                availableLights = null;
             }
+        }
 
         if (globalImportSettings.importedBlueprint != null)
         {
@@ -677,7 +695,7 @@ public class SCBPImporter : EditorWindow
 
                 lightImportSettings.fixTransforms = EditorGUILayout.Toggle("Fix Transforms", lightImportSettings.fixTransforms);
                 lightImportSettings.state = (LightStateName)EditorGUILayout.EnumPopup("State Template: ", lightImportSettings.state);
-                
+
                 // if (EditorGUI.EndChangeCheck())
                 // {
                 //     WriteSettingsToFile(globalImportSettings, lightImportSettings, blueprintSource);
@@ -700,8 +718,8 @@ public class SCBPImporter : EditorWindow
             if (GUILayout.Button("Create Material List"))
             {
                 availableMaterials = CreateMaterialList(globalImportSettings, true);
-                Debug.Log("Successfully loaded " + availableMaterials.blueprintMaterials.Count + " material definitions from source blueprint.");
-                Debug.Log("Successfully loaded " + availableMaterials.loadedMaterials.Count + " material definitions from source directory.");
+                //Debug.Log("Successfully loaded " + availableMaterials.blueprintMaterials.Count + " material definitions from source blueprint.");
+                //Debug.Log("Successfully loaded " + availableMaterials.loadedMaterials.Count + " material definitions from source directory.");
                 //Debug.Log("Successfully loaded " + availableMaterials.loadedLayers.Count + " material layer definitions from source directory.");
             }
             if (availableMaterials != null)
@@ -718,6 +736,11 @@ public class SCBPImporter : EditorWindow
                         CreateMaterials(foundMaterials, availableMaterials, globalImportSettings);
                     }
                 }
+
+                if (GUILayout.Button("Save Material List to File"))
+                {
+                    SaveMaterialDefinitions(availableMaterials, globalImportSettings);
+                }
             }
         }
         else
@@ -728,7 +751,52 @@ public class SCBPImporter : EditorWindow
         {
             AssignMaterialsToScene(globalImportSettings);
         }
+
+        if (GUILayout.Button("Revert materials in children to source"))
+        {
+            RevertMaterials(globalImportSettings.targetObject);
+        }
+
+        if (GUILayout.Button("Load Material List from File"))
+        {
+            availableMaterials = LoadMaterialDefinitions(globalImportSettings);
+        }
+
+        if (GUILayout.Button("[DEBUG] Purge used memory"))
+        {
+            availableMaterials = new MaterialDefinitions();
+            GarbageCollector.CollectIncremental();
+        }
+
+        //prefabSource = EditorGUILayout.ObjectField("Prefabs Folder: ", prefabSource, typeof(UnityEngine.Object), false);
+
+
     }
+
+    // private static UnityEngine.Object GetPathFromFolder(UnityEngine.Object obj, SerializedProperty property)
+    // {
+    //     UnityEngine.Object folderAssetObj = null;
+    //     string existingFolderPath = property.stringValue;
+    //     if (existingFolderPath != null)
+    //     {
+    //         folderAssetObj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(existingFolderPath);
+    //     }
+    //     UnityEngine.Object newFolderAssetObj = EditorGUILayout.ObjectField(property.displayName, folderAssetObj, typeof(UnityEngine.Object), false);
+    //     if (newFolderAssetObj == folderAssetObj)
+    //     {
+    //         return folderAssetObj;
+    //     }
+    //     if (newFolderAssetObj != null)
+    //     {
+    //         string newPath = AssetDatabase.GetAssetPath(newFolderAssetObj);
+    //         if (newPath != null && System.IO.Directory.Exists(newPath))
+    //         {
+    //             property.stringValue = newPath;
+    //             return newFolderAssetObj;
+    //         }
+    //     }
+    //     return null;
+    // }
 
     // private void WriteSettingsToFile(GlobalImportSettings globalSettings, LightImportSettings lightSettings, UnityEngine.Object sourceBP)
     // {
@@ -737,6 +805,13 @@ public class SCBPImporter : EditorWindow
     //     config.globalSettings = globalSettings;
     //     config.lightImportSettings = lightSettings;
     //     string configString = JsonConvert.SerializeObject(config);
+    // }
+
+    // private static void PopulatePrefabs(UnityEngine.Object prefabSource, GameObject sceneParent)
+    // {
+    //     string folderPath = AssetDatabase.GetAssetPath(prefabSource);
+
+
     // }
 
     #region File Handling
@@ -814,7 +889,7 @@ public class SCBPImporter : EditorWindow
             try { ProcessTexture(importPath, isCookie); }
             catch { Debug.LogWarning("Failed to process texture: " + importPath); }
         }
-        else if (!File.Exists(importPath)) // || settings.overwrite)
+        else if (!File.Exists(importPath) || settings.overwriteTextures)
         {
             File.Copy(sourcePath, importPath);
             try { ProcessTexture(importPath, isCookie); }
@@ -912,13 +987,16 @@ public class SCBPImporter : EditorWindow
 
     private static string GenerateGlossMap(string targetFile, GlobalImportSettings settings)
     {
+        Debug.Log("Generating glossmap for normal texture: " + targetFile);
         string sourcePath = settings.assetDestination + "\\" + targetFile;
         string importPath = sourcePath.ReplaceLast(".", ".glossmap.");
-        if (!File.Exists(importPath)) // || settings.overwrite)
+        if (!File.Exists(importPath) || settings.overwriteTextures)
         {
             File.Copy(sourcePath, importPath);
-            try { ProcessTexture(importPath); }
-            catch { Debug.LogWarning("Failed to process texture: " + importPath); }
+            //try { 
+            //Debug.Log("Copying file to: " + importPath);
+                ProcessTexture(importPath); //}
+            //catch { Debug.LogWarning("Failed to process texture: " + importPath); }
         }
 
         return importPath;
@@ -1031,6 +1109,27 @@ public class SCBPImporter : EditorWindow
         return null;
     }
 
+    private static void SaveMaterialDefinitions(MaterialDefinitions matDefs, GlobalImportSettings settings)
+    {
+        string jsonText = JsonConvert.SerializeObject(matDefs);
+        if (!Directory.Exists(settings.configFilePath))
+        {
+            Directory.CreateDirectory(settings.configFilePath);
+        }
+
+        //File.Create(settings.configFilePath + "/Saved_Materials.Json");
+        File.WriteAllText(settings.configFilePath + "/Saved_Materials.Json", jsonText);
+    }
+
+    private static MaterialDefinitions LoadMaterialDefinitions(GlobalImportSettings settings)
+    {
+        if (File.Exists(settings.configFilePath + "/Saved_Materials.Json"))
+        {
+            return JsonConvert.DeserializeObject<MaterialDefinitions>(File.ReadAllText(settings.configFilePath + "/Saved_Materials.Json"));
+        }
+        else { return null; }
+    }
+
     #endregion
 
     #region Material Handling
@@ -1065,10 +1164,10 @@ public class SCBPImporter : EditorWindow
                         //Debug.Log("Adding Material to list: " + subMat.Name);
                         if (subMat.Shader != "Layer" && subMat.Name != null && subMat.Name != "")
                         {
-                            string subMatName = String.Concat(matNameBase, subMat.Name);
+                            string subMatName = String.Concat(matNameBase, subMat.Name).ToLower();
                             if (!bpImportedMats.ContainsKey(subMatName))
                             {
-                                bpImportedMats.Add(subMatName.ToLower(), subMat);
+                                bpImportedMats.Add(subMatName, subMat);
                             }
                         }
                     }
@@ -1090,10 +1189,10 @@ public class SCBPImporter : EditorWindow
                         //Debug.Log("Adding Material to list: " + subMat.Name);
                         if (subMat.Shader != "Layer" && subMat.Name != null && subMat.Name != "")
                         {
-                            string subMatName = String.Concat(matNameBase, subMat.Name);
+                            string subMatName = String.Concat(matNameBase, subMat.Name).ToLower();
                             if (!importedMats.ContainsKey(subMatName))
                             {
-                                importedMats.Add(subMatName.ToLower(), subMat);
+                                importedMats.Add(subMatName, subMat);
                             }
                         }
                     }
@@ -1184,18 +1283,61 @@ public class SCBPImporter : EditorWindow
                 }
             }
         }
+        
+        foreach (SkinnedMeshRenderer mesh in sceneParent.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            foreach (Material m in mesh.sharedMaterials)
+            {
+                string mName = m.name.ToLower();
+                // if (mName.EndsWith(@" (Instance)"))
+                // {
+                //     mName = mName.ReplaceLast(@" (Instance)", "");
+                // }
+                //mName.Remove(mName[mName.Count() - 11], 10);
+                if (!foundMats.Contains(mName))
+                {
+                    if (mats.ContainsKey(mName))
+                    {
+                        foundMats.Add(mName);
+                    }
+                    else if (matDefs.loadedMaterials.ContainsKey(mName))
+                    {
+                        foundMats.Add(mName);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Scene material " + mName + " has no match in loaded materials.");
+                    }
+                }
+            }
+        }
 
         return foundMats;
     }
-    
+
+    private static void RevertMaterials(GameObject sceneParent)
+    {
+        foreach (MeshRenderer mesh in sceneParent.GetComponentsInChildren<MeshRenderer>())
+        {
+            SerializedObject obj = new SerializedObject(mesh);
+            PrefabUtility.RevertObjectOverride(mesh, UnityEditor.InteractionMode.AutomatedAction);
+        }
+        
+        foreach (SkinnedMeshRenderer mesh in sceneParent.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            SerializedObject obj = new SerializedObject(mesh);
+            PrefabUtility.RevertObjectOverride(mesh, UnityEditor.InteractionMode.AutomatedAction);
+        }
+    }
+
     private static void CreateMaterials(List<string> sceneMats, MaterialDefinitions matDefs, GlobalImportSettings settings)
     {
 
         ShaderList shaders = new ShaderList();
-    
+
         shaders.illumShader = Shader.Find("Star Citizen/Illum");
         shaders.shadowlessShader = Shader.Find("Star Citizen/Illum (No Shadows)");
-        shaders.decalShader = Shader.Find("Star Citizen/Illum.Decal");
+        shaders.decalShader = Shader.Find("Star Citizen/Illum Parallax");
         shaders.emitShader = Shader.Find("Star Citizen/Illum.Emit");
         shaders.pomShader = Shader.Find("Star Citizen/Decals POM");
         shaders.hardSurfaceShader = Shader.Find("Star Citizen/HardSurface");
@@ -1220,41 +1362,44 @@ public class SCBPImporter : EditorWindow
 
         var bpMats = matDefs.loadedMaterials;
         var bpLayers = matDefs.loadedLayers;
-            
+
         List<string> failedMatTypes = new List<string>();
         List<string> failedTextures = new List<string>();
 
         foreach (string matName in sceneMats)
         {
             string targetPath = settings.materialGenerationPath + "/" + matName + ".mat";
+            //Debug.Log("Generating Material: " + matName);
 
-            if (!settings.overwrite && AssetDatabase.LoadAssetAtPath<Material>(targetPath) != null)
+            if (!settings.overwriteMaterials && AssetDatabase.LoadAssetAtPath<Material>(targetPath) != null)
             {
                 continue;
             }
             // Material matFile = AssetDatabase.LoadAssetAtPath<Material>(targetPath);
-                // if (matFile == null)
-                // {
-                //     matFile = new Material(shaders.illumShader);
-                //     try
-                //     {
-                //         AssetDatabase.CreateAsset(matFile, targetPath);
-                //     }
-                //     catch { Debug.LogWarning("Failed to generate material: " + targetPath); }
-                //     //continue;
-                // }
+            // if (matFile == null)
+            // {
+            //     matFile = new Material(shaders.illumShader);
+            //     try
+            //     {
+            //         AssetDatabase.CreateAsset(matFile, targetPath);
+            //     }
+            //     catch { Debug.LogWarning("Failed to generate material: " + targetPath); }
+            //     //continue;
+            // }
 
-                // var importer = AssetImporter.GetAtPath(targetPath);
+            // var importer = AssetImporter.GetAtPath(targetPath);
 
-                Debug.Log("Generating Material: " + matName);
             SubMat currentMat = bpMats[matName];
             if (failedMatTypes.Contains(currentMat.Shader))
             {
+                Debug.LogWarning("Failed to create material: " + matName + " with unknown shader type: " + currentMat.Shader);
                 continue;
             }
             Dictionary<int, MatTextureReference> matTextures = new Dictionary<int, MatTextureReference>();
+
             try
             {
+                string ddnaSearchPath = "";
                 foreach (MatTexture texRef in currentMat.Textures.Texture)
                 {
                     //Textures: 
@@ -1274,46 +1419,89 @@ public class SCBPImporter : EditorWindow
                         continue;
                     }
                     MatTextureReference newtex = new MatTextureReference();
-                    string texSlot = texRef.Map.Remove(0, 7);
-                    //newtex.textureSlot = Convert.ToInt16(texSlot);
-                    newtex.texturePath = ImportFile(texRef.File, settings);
+                    int texSlot = Convert.ToInt16(texRef.Map.Remove(0, 7));
+                    if (currentMat.Shader == "MeshDecal")
+                    {
+                        if (texSlot == 2) { texSlot = 4; }
+                        else if (texSlot == 3) { texSlot = 2; }
+                        else if (texSlot == 4) { texSlot = 8; }
+                    }
+
+                    if (texSlot == 3)
+                    {
+                        //Debug.LogWarning("Looking for Glossmap: " + texRef.File.ReplaceLast(".", ".glossmap."));
+                        if (!texRef.File.ToLower().Contains(".gloss"))
+                        {
+                            newtex.texturePath = ImportFile(texRef.File.ReplaceLast(".", ".glossmap."), settings);
+                            if (newtex.texturePath == "")
+                            {
+                                //Debug.LogWarning("Failed to find Glossmap, looking for normal ddn: ");
+                                newtex.texturePath = ImportFile(texRef.File, settings);
+                            }
+                        }
+                        else
+                        {
+                            newtex.texturePath = ImportFile(texRef.File, settings);
+                        }
+                    }
+                    //newtex.textureSlot = texSlot;
+                    else { newtex.texturePath = ImportFile(texRef.File, settings); }
                     if (newtex.texturePath == "")
                     {
                         failedTextures.Add(texRef.File);
                         continue;
+                    }
+                    if (texSlot == 2)
+                    {
+                        ddnaSearchPath = texRef.File;
                     }
                     if (texRef.TexMod != null)
                     {
                         newtex.textureTiling = new Vector2(texRef.TexMod.TileU, texRef.TexMod.TileV);
                     }
                     else { newtex.textureTiling = new Vector2(1.0f, 1.0f); }
-                    matTextures.Add(Convert.ToInt16(texSlot), newtex);
+                    matTextures.Add(texSlot, newtex);
+                }
+                if (!matTextures.ContainsKey(3))
+                {
+                    if (matTextures.ContainsKey(2))
+                    {
+                        MatTextureReference newTex = new MatTextureReference();
+                        newTex.texturePath = ImportFile(ddnaSearchPath.ReplaceLast(".", ".glossmap."), settings);
+                        if (newTex.texturePath != "")
+                        {
+                            newTex.textureTiling = matTextures[2].textureTiling;
+                            matTextures.Add(3, newTex);
+                        }
+                    }
                 }
             }
             catch { }
 
-            try
-            {
-                if (matTextures.ContainsKey(3))
-                {
-                    if (!matTextures[3].texturePath.ToLower().Contains(".glossmap"))
-                    {
-                        matTextures[3].texturePath = GenerateGlossMap(matTextures[3].texturePath, settings);
-                    }
-                }
-                else if (matTextures.ContainsKey(2))
-                {
-                    MatTextureReference newGloss = new MatTextureReference();
-                    newGloss.textureTiling = matTextures[2].textureTiling;
-                    newGloss.texturePath = GenerateGlossMap(matTextures[2].texturePath, settings);
-                    matTextures.Add(3, newGloss);
-                }
-            }
-            catch { }
+
+            // try
+            // {
+            //     if (matTextures.ContainsKey(3))
+            //     {
+            //         if (!matTextures[3].texturePath.ToLower().Contains(".glossmap"))
+            //         {
+            //             matTextures[3].texturePath = GenerateGlossMap(matTextures[3].texturePath, settings);
+            //         }
+            //     }
+            //     else if (matTextures.ContainsKey(2))
+            //     {
+            //         MatTextureReference newGloss = new MatTextureReference();
+            //         newGloss.textureTiling = matTextures[2].textureTiling;
+            //         newGloss.texturePath = GenerateGlossMap(matTextures[2].texturePath, settings);
+            //         matTextures.Add(3, newGloss);
+            //     }
+            // }
+            // catch { }
 
             //Material mat = new Material(Shader.Find("Standard (Specular setup)"));
             //Material mat = new Material(illumBaseMatProxy);
             Material mat = new Material(shaders.illumShader);
+            mat.name = matName;
             if (currentMat.Shader == "Illum")
             {
                 //mat.shader = shaders.illumShader;
@@ -1322,12 +1510,21 @@ public class SCBPImporter : EditorWindow
                     Debug.LogWarning("Material: " + matName + " is using sub-layers but has the Illum shader applied.");
                 }
 
-                if (matName.Contains("_pom"))// || currentMat.StringGenMask.Contains("PARALLAX_OCCLUSION_MAPPING"))
+                if (matName.Contains("_pom"))
                 {
                     mat.shader = shaders.pomShader;
                     //mat = new Material(pomMatProxy);
 
                     //Scale, Bias, Layers, NonPlanar, AlphaMidLevelControl, Brightness
+                }
+                else if (matName.Contains("_decal") && !matName.Contains("_non_decal") || currentMat.StringGenMask.Contains("%DECAL"))
+                {
+                    mat.shader = shaders.shadowlessShader;
+                    //mat = new Material(illumDecalMatProxy);
+                    Color diffColor = mat.GetColor("_DiffuseColor");
+                    diffColor.a = 0.0f;
+                    try { mat.SetColor("_DiffuseColor", diffColor); } catch { }
+                    try { mat.SetFloat("_UseAlpha", 1.0f); } catch { }
                 }
                 else if (matName.Contains("glow"))
                 {
@@ -1339,14 +1536,9 @@ public class SCBPImporter : EditorWindow
                         try { mat.SetFloat("_GeomLink", 1.0f); } catch { }
                     }
                 }
-                else if (matName.Contains("_decal") || currentMat.StringGenMask.Contains("%DECAL"))
+                else if (currentMat.StringGenMask.Contains("PARALLAX_OCCLUSION_MAPPING"))
                 {
-                    mat.shader = shaders.shadowlessShader;
-                    //mat = new Material(illumDecalMatProxy);
-                    Color diffColor = mat.GetColor("_DiffuseColor");
-                    diffColor.a = 0.0f;
-                    try { mat.SetColor("_DiffuseColor", diffColor); } catch { }
-                    try { mat.SetFloat("_UseAlpha", 1.0f); } catch { }
+                    mat.shader = shaders.decalShader;
                 }
                 else if (matName.ToLower().Contains("rtt_text_to_decal"))
                 {
@@ -1360,6 +1552,30 @@ public class SCBPImporter : EditorWindow
 
                 if (currentMat.AlphaTest != null || currentMat.StringGenMask.Contains("USE_OPACITY_MAP"))
                 {
+                    try { mat.SetFloat("_UseAlpha", 1.0f); } catch { }
+                }
+            }
+            else if (currentMat.Shader == "MeshDecal")
+            {
+
+                if (matName.Contains("_pom"))
+                {
+                    mat.shader = shaders.pomShader;
+                    //mat = new Material(pomMatProxy);
+
+                    //Scale, Bias, Layers, NonPlanar, AlphaMidLevelControl, Brightness
+                }
+                else if (currentMat.StringGenMask.Contains("PARALLAX_OCCLUSION_MAPPING"))
+                {
+                    mat.shader = shaders.decalShader;
+                }
+                else
+                {
+                    mat.shader = shaders.shadowlessShader;
+                    //mat = new Material(illumDecalMatProxy);
+                    Color diffColor = mat.GetColor("_DiffuseColor");
+                    diffColor.a = 0.0f;
+                    try { mat.SetColor("_DiffuseColor", diffColor); } catch { }
                     try { mat.SetFloat("_UseAlpha", 1.0f); } catch { }
                 }
             }
@@ -1391,18 +1607,21 @@ public class SCBPImporter : EditorWindow
                 mat.shader = shaders.layerBlendShader;
                 //mat = new Material(layerBlendMatProxy);
             }
+            else if (currentMat.Shader.ToLower() == "cloth")
+            {
+                //We're already set to illum
+            }
             else
             {
                 //Known missing shader types:
                 //Hologramcig
                 //HumanSkin
                 //IES
-                //Cloth
-                //MeshDecal
                 failedMatTypes.Add(currentMat.Shader);
                 Debug.LogWarning("Failed to create material: " + matName + " with unknown shader type: " + currentMat.Shader);
                 continue;
             }
+            Debug.Log("Generating Material: " + matName + ", with shader of type: " + mat.shader);
 
             string[] splitProp;
             Color propColor;
@@ -1411,7 +1630,7 @@ public class SCBPImporter : EditorWindow
                 splitProp = currentMat.Diffuse.Split(",");
                 if (currentMat.Shader == "GlassPBR" || currentMat.Shader == "Glass" || currentMat.Shader == "DisplayScreen")
                 {
-                    try { propColor = new Color(Convert.ToSingle(splitProp[0]), Convert.ToSingle(splitProp[1]), Convert.ToSingle(splitProp[2]), Convert.ToSingle(currentMat.PublicParams["@Thickness"])*10); }
+                    try { propColor = new Color(Convert.ToSingle(splitProp[0]), Convert.ToSingle(splitProp[1]), Convert.ToSingle(splitProp[2]), Convert.ToSingle(currentMat.PublicParams["@Thickness"])); }
                     catch { propColor = new Color(Convert.ToSingle(splitProp[0]), Convert.ToSingle(splitProp[1]), Convert.ToSingle(splitProp[2]), mat.GetColor("_BaseColor").a); }
                 }
                 else { propColor = new Color(Convert.ToSingle(splitProp[0]), Convert.ToSingle(splitProp[1]), Convert.ToSingle(splitProp[2]), mat.GetColor("_BaseColor").a); }
@@ -1461,21 +1680,27 @@ public class SCBPImporter : EditorWindow
             //DDNA Glossmap Texture; is sometimes the same, is sometimes separate; Slot 3
             if (matTextures.ContainsKey(3))
             {
-                if (!matTextures.ContainsKey(2) || matTextures[2].texturePath != matTextures[3].texturePath)
-                {
-                    try
-                    {
-                        mat.SetTexture("_DDNAGlossmap", AssetDatabase.LoadAssetAtPath<Texture>(matTextures[3].texturePath));
-                        mat.SetTextureScale("_DDNAGlossmap", matTextures[3].textureTiling);
-                    }
-                    catch { }
-                }
+                // if (!matTextures.ContainsKey(2) || matTextures[2].texturePath != matTextures[3].texturePath)
+                // {
+                //     try
+                //     {
+                //         mat.SetTexture("_DDNAGlossmap", AssetDatabase.LoadAssetAtPath<Texture>(matTextures[3].texturePath));
+                //         mat.SetTextureScale("_DDNAGlossmap", matTextures[3].textureTiling);
+                //     }
+                //     catch { }
+                // }
+                // try
+                // {
+                //     mat.SetTexture("_DDNAGlossmap", AssetDatabase.LoadAssetAtPath<Texture>(matTextures[2].texturePath.ReplaceLast(".", ".glossmap.")));
+                //     mat.SetTextureScale("_DDNAGlossmap", matTextures[2].textureTiling);
+                // }
+                // catch { }  
                 try
                 {
-                    mat.SetTexture("_DDNAGlossmap", AssetDatabase.LoadAssetAtPath<Texture>(matTextures[2].texturePath.ReplaceLast(".", ".glossmap.")));
-                    mat.SetTextureScale("_DDNAGlossmap", matTextures[2].textureTiling);
+                    mat.SetTexture("_DDNAGlossmap", AssetDatabase.LoadAssetAtPath<Texture>(matTextures[3].texturePath));
+                    mat.SetTextureScale("_DDNAGlossmap", matTextures[3].textureTiling);
                 }
-                catch { }  
+                catch { }
             }
             else
             {
@@ -1557,7 +1782,7 @@ public class SCBPImporter : EditorWindow
             {
                 splitProp = currentMat.PublicParams["@BlendLayer2DiffuseColor"].Split(",");
                 propColor = new Color(Convert.ToSingle(splitProp[0]), Convert.ToSingle(splitProp[1]), Convert.ToSingle(splitProp[2]), 1.0f);
-                //mat.SetColor("_BlendLayer2DiffuseColor", propColor);
+                mat.SetColor("_BlendLayer2DiffuseColor", propColor);
             }
             catch { }
 
@@ -1565,7 +1790,7 @@ public class SCBPImporter : EditorWindow
             {
                 splitProp = currentMat.PublicParams["@BlendLayer2SpecularColor"].Split(",");
                 propColor = new Color(Convert.ToSingle(splitProp[0]), Convert.ToSingle(splitProp[1]), Convert.ToSingle(splitProp[2]), 1.0f);
-                //mat.SetColor("_BlendLayer2SpecularColor", propColor);
+                mat.SetColor("_BlendLayer2SpecularColor", propColor);
             }
             catch { }
 
@@ -1573,7 +1798,7 @@ public class SCBPImporter : EditorWindow
             {
                 splitProp = currentMat.PublicParams["@BlendLayer2Glossiness"].Split(",");
                 propColor = new Color(Convert.ToSingle(splitProp[0]), Convert.ToSingle(splitProp[1]), Convert.ToSingle(splitProp[2]), 1.0f);
-                //mat.SetFloat("_BlendLayer2Glossiness", Convert.ToSingle(currentMat.PublicParams["@BlendLayer2Glossiness"]) / 255.0f);
+                mat.SetFloat("_BlendLayer2Glossiness", Convert.ToSingle(currentMat.PublicParams["@BlendLayer2Glossiness"]) / 255.0f);
             }
             catch { }
 
@@ -1583,7 +1808,7 @@ public class SCBPImporter : EditorWindow
             try { mat.SetFloat("_POMDisplacement", Convert.ToSingle(currentMat.PublicParams["@PomDisplacement"])); } catch { }
             try { mat.SetFloat("_DetailDiffuseScale", Convert.ToSingle(currentMat.PublicParams["@DetailDiffuseScale"])); } catch { }
             try { mat.SetFloat("_DetailGlossScale", Convert.ToSingle(currentMat.PublicParams["@DetailGlossScale"])); } catch { }
-            try { mat.SetFloat("_DetailBumpScale", Convert.ToSingle(currentMat.PublicParams["@DetailBumpScale"])); } catch {}
+            try { mat.SetFloat("_DetailBumpScale", Convert.ToSingle(currentMat.PublicParams["@DetailBumpScale"])); } catch { }
 
             if (currentMat.MatLayers != null)
             {
@@ -1609,12 +1834,17 @@ public class SCBPImporter : EditorWindow
                         Dictionary<int, MatTextureReference> layerTextures = new Dictionary<int, MatTextureReference>();
                         try
                         {
+                            string ddnaSearchPath = "";
                             foreach (MatTexture texRef in currentLayer.Textures.Texture)
                             {
                                 //Textures: 
                                 //Ignore "nearest_cubemap" (This may actually be useful for grabbing from reflection probes)
                                 //Ignore "$RenderToTexture" (May be useful for the interactive display screens?)
                                 //Special handling case for "$TintPaletteDecal"?  This applies a special decal node that has not yet been transferred over
+                                if (texRef.File == null)
+                                {
+                                    continue;
+                                }
                                 if (texRef.File.Contains("$RenderToTexture") || texRef.File.Contains("nearest_cubemap") || texRef.File.Contains("$TintPaletteDecal"))
                                 {
                                     continue;
@@ -1624,42 +1854,86 @@ public class SCBPImporter : EditorWindow
                                     continue;
                                 }
                                 MatTextureReference newtex = new MatTextureReference();
-                                string texSlot = texRef.Map.Remove(0, 7);
+                                int texSlot = Convert.ToInt16(texRef.Map.Remove(0, 7));
                                 //newtex.textureSlot = Convert.ToInt16(texSlot);
-                                newtex.texturePath = ImportFile(texRef.File, settings);
+                                //newtex.texturePath = ImportFile(texRef.File, settings);
+
+                                if (texSlot == 3)
+                                {
+                                    //Debug.LogWarning("Looking for Glossmap: " + texRef.File.ReplaceLast(".", ".glossmap."));
+                                    //newtex.texturePath = ImportFile(texRef.File.ReplaceLast(".", ".glossmap."), settings);
+                                    //if (newtex.texturePath == "")
+                                    //{
+                                    //Debug.LogWarning("Failed to find Glossmap, looking for normal ddn: ");
+                                    //    newtex.texturePath = ImportFile(texRef.File, settings);
+                                    //}
+
+                                    if (!texRef.File.ToLower().Contains(".gloss"))
+                                    {
+                                        newtex.texturePath = ImportFile(texRef.File.ReplaceLast(".", ".glossmap."), settings);
+                                        if (newtex.texturePath == "")
+                                        {
+                                            //Debug.LogWarning("Failed to find Glossmap, looking for normal ddn: ");
+                                            newtex.texturePath = ImportFile(texRef.File, settings);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        newtex.texturePath = ImportFile(texRef.File, settings);
+                                    }
+                                }
+                                //newtex.textureSlot = texSlot;
+                                else { newtex.texturePath = ImportFile(texRef.File, settings); }
                                 if (newtex.texturePath == "")
                                 {
                                     failedTextures.Add(texRef.File);
                                     continue;
+                                }
+                                if (texSlot == 2)
+                                {
+                                    ddnaSearchPath = texRef.File;
                                 }
                                 if (texRef.TexMod != null)
                                 {
                                     newtex.textureTiling = new Vector2(texRef.TexMod.TileU, texRef.TexMod.TileV);
                                 }
                                 else { newtex.textureTiling = new Vector2(1.0f, 1.0f); }
-                                layerTextures.Add(Convert.ToInt16(texSlot), newtex);
+                                layerTextures.Add(texSlot, newtex);
                             }
-                        }
-                        catch { }
-                        
-                        try
-                        {
-                            if (layerTextures.ContainsKey(3))
+                            if (!layerTextures.ContainsKey(3))
                             {
-                                if (!layerTextures[3].texturePath.ToLower().Contains(".glossmap"))
+                                if (layerTextures.ContainsKey(2))
                                 {
-                                    layerTextures[3].texturePath = GenerateGlossMap(layerTextures[3].texturePath, settings);
+                                    MatTextureReference newTex = new MatTextureReference();
+                                    newTex.texturePath = ImportFile(ddnaSearchPath.ReplaceLast(".", ".glossmap."), settings);
+                                    if (newTex.texturePath != "")
+                                    {
+                                        newTex.textureTiling = layerTextures[2].textureTiling;
+                                        layerTextures.Add(3, newTex);
+                                    }
                                 }
                             }
-                            else if (layerTextures.ContainsKey(2))
-                            {
-                                MatTextureReference newGloss = new MatTextureReference();
-                                newGloss.textureTiling = layerTextures[2].textureTiling;
-                                newGloss.texturePath = GenerateGlossMap(layerTextures[2].texturePath, settings);
-                                layerTextures.Add(3, newGloss);
-                            }
                         }
                         catch { }
+
+                        // try
+                        // {
+                        //     if (layerTextures.ContainsKey(3))
+                        //     {
+                        //         if (!layerTextures[3].texturePath.ToLower().Contains(".glossmap"))
+                        //         {
+                        //             layerTextures[3].texturePath = GenerateGlossMap(layerTextures[3].texturePath, settings);
+                        //         }
+                        //     }
+                        //     else if (layerTextures.ContainsKey(2))
+                        //     {
+                        //         MatTextureReference newGloss = new MatTextureReference();
+                        //         newGloss.textureTiling = layerTextures[2].textureTiling;
+                        //         newGloss.texturePath = GenerateGlossMap(layerTextures[2].texturePath, settings);
+                        //         layerTextures.Add(3, newGloss);
+                        //     }
+                        // }
+                        // catch { }
 
                         if (matLayer.Name.ToLower() == "primary" || matLayer.Name.ToLower() == "baselayer1")
                         {
@@ -1698,19 +1972,26 @@ public class SCBPImporter : EditorWindow
 
                             if (layerTextures.ContainsKey(3))
                             {
-                                if (!layerTextures.ContainsKey(2) || layerTextures[2].texturePath != layerTextures[3].texturePath)
-                                {
-                                    try
-                                    {
-                                        mat.SetTexture("_DDNAGlossmap1", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[3].texturePath));
-                                        mat.SetTextureScale("_DDNAGlossmap1", layerTextures[3].textureTiling);
-                                    }
-                                    catch { }
-                                }
+                                // if (!layerTextures.ContainsKey(2) || layerTextures[2].texturePath != layerTextures[3].texturePath)
+                                // {
+                                //     try
+                                //     {
+                                //         mat.SetTexture("_DDNAGlossmap1", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[3].texturePath));
+                                //         mat.SetTextureScale("_DDNAGlossmap1", layerTextures[3].textureTiling);
+                                //     }
+                                //     catch { }
+                                // }
+                                // try
+                                // {
+                                //     mat.SetTexture("_DDNAGlossmap1", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[2].texturePath.ReplaceLast(".", ".glossmap.")));
+                                //     mat.SetTextureScale("_DDNAGlossmap1", layerTextures[2].textureTiling);
+                                // }
+                                // catch { }
+
                                 try
                                 {
-                                    mat.SetTexture("_DDNAGlossmap1", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[2].texturePath.ReplaceLast(".", ".glossmap.")));
-                                    mat.SetTextureScale("_DDNAGlossmap1", layerTextures[2].textureTiling);
+                                    mat.SetTexture("_DDNAGlossmap1", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[3].texturePath));
+                                    mat.SetTextureScale("_DDNAGlossmap1", layerTextures[3].textureTiling);
                                 }
                                 catch { }
                             }
@@ -1792,19 +2073,26 @@ public class SCBPImporter : EditorWindow
 
                             if (layerTextures.ContainsKey(3))
                             {
-                                if (!layerTextures.ContainsKey(2) || layerTextures[2].texturePath != layerTextures[3].texturePath)
-                                {
-                                    try
-                                    {
-                                        mat.SetTexture("_DDNAGlossmap2", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[3].texturePath));
-                                        mat.SetTextureScale("_DDNAGlossmap2", layerTextures[3].textureTiling);
-                                    }
-                                    catch { }
-                                }
+                                // if (!layerTextures.ContainsKey(2) || layerTextures[2].texturePath != layerTextures[3].texturePath)
+                                // {
+                                //     try
+                                //     {
+                                //         mat.SetTexture("_DDNAGlossmap2", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[3].texturePath));
+                                //         mat.SetTextureScale("_DDNAGlossmap2", layerTextures[3].textureTiling);
+                                //     }
+                                //     catch { }
+                                // }
+                                // try
+                                // {
+                                //     mat.SetTexture("_DDNAGlossmap2", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[2].texturePath.ReplaceLast(".", ".glossmap.")));
+                                //     mat.SetTextureScale("_DDNAGlossmap2", layerTextures[2].textureTiling);
+                                // }
+                                // catch { }
+
                                 try
                                 {
-                                    mat.SetTexture("_DDNAGlossmap2", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[2].texturePath.ReplaceLast(".", ".glossmap.")));
-                                    mat.SetTextureScale("_DDNAGlossmap2", layerTextures[2].textureTiling);
+                                    mat.SetTexture("_DDNAGlossmap2", AssetDatabase.LoadAssetAtPath<Texture>(layerTextures[3].texturePath));
+                                    mat.SetTextureScale("_DDNAGlossmap2", layerTextures[3].textureTiling);
                                 }
                                 catch { }
                             }
@@ -1870,17 +2158,19 @@ public class SCBPImporter : EditorWindow
             // }
             //}
             //catch
-            else
+            //else
+            //{
+            try
             {
-                try
-                {
-                    AssetDatabase.CreateAsset(mat, targetPath);
-                    //ssetDatabase.ImportAsset(targetPath, ImportAssetOptions.ForceUpdate);
-                }
-                catch { Debug.LogWarning("Failed to generate material: " + targetPath); }
+                AssetDatabase.CreateAsset(mat, targetPath);
+                //AssetDatabase.ImportAsset(targetPath, ImportAssetOptions.ForceUpdate);
             }
+            catch { Debug.LogWarning("Failed to generate material: " + targetPath); }
+            //}
 
         }
+
+        AssetDatabase.Refresh();
 
         if (failedTextures.Count > 0)
         {
@@ -1905,7 +2195,36 @@ public class SCBPImporter : EditorWindow
             List<Material> newMats = new List<Material>();
             for (int i = 0; i < oldMats.Count(); i++)
             {
-                string mName = oldMats[i].name;
+                string mName = oldMats[i].name.ToLower();
+                string targetPath = settings.materialGenerationPath + "/" + mName + ".mat";
+                //Material mat = Resources.Load(targetPath, typeof(Material)) as Material;
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(targetPath);
+                if (mat != null)
+                {
+                    newMats.Add(mat);
+                    //mesh.sharedMaterials[i] = mat;
+                    succeededMats++;
+                }
+                else
+                {
+                    failedMaterials.Add(mName + " in Renderer " + mesh.transform.name);
+                    newMats.Add(oldMats[i]);
+                }
+
+            }
+
+            mesh.SetSharedMaterials(newMats);
+        }
+
+        foreach (SkinnedMeshRenderer mesh in settings.targetObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            //Dictionary<string, Material> newMats = new Dictionary<string, Material>();
+
+            Material[] oldMats = mesh.sharedMaterials;
+            List<Material> newMats = new List<Material>();
+            for (int i = 0; i < oldMats.Count(); i++)
+            {
+                string mName = oldMats[i].name.ToLower();
                 string targetPath = settings.materialGenerationPath + "/" + mName + ".mat";
                 //Material mat = Resources.Load(targetPath, typeof(Material)) as Material;
                 Material mat = AssetDatabase.LoadAssetAtPath<Material>(targetPath);

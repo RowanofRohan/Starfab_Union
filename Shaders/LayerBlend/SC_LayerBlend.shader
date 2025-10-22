@@ -7,6 +7,7 @@ Shader "Star Citizen/Layer Blend"
 		[Gamma] _BaseColor( "Base Color", Color ) = ( 1, 1, 1, 1 )
 		_DDNAColor( "DDNA Color", Color ) = ( 0.5, 0.5, 1, 1 )
 		_NormalStrength( "Normal Strength", Float ) = 0.5
+		_SpecularColor( "Specular Color", Color ) = ( 0, 0, 0, 1 )
 		_DecalColor( "Decal Color", Color ) = ( 0, 0, 0, 1 )
 		_WDAColor( "WDA Color", Color ) = ( 0, 0, 0, 1 )
 		_WearLevel( "Wear Level", Float ) = 0
@@ -142,6 +143,7 @@ Shader "Star Citizen/Layer Blend"
 			half3 Transmission;
 		};
 
+		uniform float4 _SpecularColor;
 		uniform float4 _BaseLayer4DDNA;
 		uniform float4 _BaseLayer3DDNA;
 		uniform float4 _BlendColor;
@@ -569,7 +571,7 @@ Shader "Star Citizen/Layer Blend"
 
 		ENDCG
 		CGPROGRAM
-		#pragma surface surf StandardSpecularCustom keepalpha fullforwardshadows exclude_path:deferred 
+		#pragma surface surf StandardSpecularCustom keepalpha fullforwardshadows exclude_path:deferred nometa 
 
 		ENDCG
 		Pass
@@ -717,7 +719,6 @@ Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Cultur
 Node;AmplifyShaderEditor.FunctionNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;75;-592,64;Inherit;False;SC Tint;46;;61340;80e1f18b9d7c52c4fa81e9ff33b30a1d;0;8;15;COLOR;0,0,0,0;False;16;COLOR;0,0,0,0;False;17;FLOAT;0;False;12;COLOR;0,0,0,0;False;18;COLOR;0,0,0,0;False;6;FLOAT3;0,0,0;False;14;FLOAT;0;False;19;COLOR;0,0,0,0;False;5;COLOR;0;FLOAT;48;FLOAT4;1;FLOAT;46;COLOR;2
 Node;AmplifyShaderEditor.RangedFloatNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;64;-672,-640;Inherit;False;Property;_WearLevel;Wear Level;7;0;Create;True;0;0;0;False;0;False;0;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;63;-672,-496;Inherit;False;Property;_Emission;Emission;12;0;Create;True;0;0;0;False;0;False;0,0,0,0;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
-Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;98;-704,-1216;Inherit;False;Property;_BaseColor;Base Color;0;1;[Gamma];Create;True;0;0;0;False;0;False;1,1,1,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;67;-576,-944;Inherit;False;Property;_DDNAColor;DDNA Color;2;0;Create;True;0;0;0;False;0;False;0.5,0.5,1,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;100;-704,-848;Inherit;False;Property;_WDAColor;WDA Color;6;0;Create;True;0;0;0;False;0;False;0,0,0,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;107;-848,-672;Inherit;False;Property;_BlendColor;Blend Color;8;0;Create;True;0;0;0;False;0;False;1,0,0,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
@@ -739,13 +740,14 @@ Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Cultur
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;84;-816,784;Inherit;False;Property;_BaseLayer4DDNA;Base Layer 4 DDNA;56;0;Create;True;0;0;0;False;0;False;0.5019608,0.5019608,1,0.4509804;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;85;-544,848;Inherit;False;Property;_BaseLayer4Spec;Base Layer 4 Spec;57;0;Create;True;0;0;0;False;0;False;0.2117647,0.2117647,0.2117647,0;0,0,0,0;True;False;0;6;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;82;-544,608;Inherit;False;Property;_BaseLayer3Spec;Base Layer 3 Spec;54;0;Create;True;0;0;0;False;0;False;0.2117647,0.2117647,0.2117647,0;0,0,0,0;True;False;0;6;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
+Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;98;-704,-1216;Inherit;False;Property;_BaseColor;Base Color;0;1;[Gamma];Create;True;0;0;0;False;0;False;1,1,1,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.RangedFloatNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;60;-656,-560;Inherit;False;Property;_MetalTweak;Metal Tweak;10;0;Create;True;0;0;0;False;0;False;0;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;106;272,144;Inherit;False;Property;_Transmission;Transmission;11;0;Create;True;0;0;0;False;0;False;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;58;-336,-864;Inherit;False;Property;_SpecularColor;Specular Color;4;0;Create;True;0;0;0;False;0;False;0,0,0,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;108;-31.63806,-806.7836;Inherit;False;Property;_DispColor;Disp Color;9;0;Create;True;0;0;0;False;0;False;0,0,0,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.FunctionNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;110;-96,-80;Inherit;False;SC Layer Blend;-1;;61346;58d12b21814b6fc48b12590f1cece3ab;0;63;62;COLOR;0,0,0,0;False;63;COLOR;0,0,0,0;False;64;COLOR;0,0,0,0;False;65;COLOR;0,0,0,0;False;66;COLOR;0,0,0,0;False;60;COLOR;0,0,0,0;False;61;FLOAT;0;False;17;COLOR;0,0,0,0;False;67;COLOR;0,0,0,0;False;68;FLOAT;0;False;100;FLOAT;0;False;101;FLOAT;0;False;70;COLOR;0,0,0,0;False;71;FLOAT;0;False;72;COLOR;0,0,0,0;False;18;FLOAT3;0,0,0;False;22;FLOAT;0;False;26;FLOAT3;0,0,0;False;9;FLOAT;0;False;5;FLOAT3;0,0,0;False;13;FLOAT;0;False;19;FLOAT3;0,0,0;False;23;FLOAT;0;False;27;FLOAT3;0,0,0;False;10;FLOAT;0;False;6;FLOAT3;0,0,0;False;14;FLOAT;0;False;20;FLOAT3;0,0,0;False;24;FLOAT;0;False;28;FLOAT3;0,0,0;False;11;FLOAT;0;False;7;FLOAT3;0,0,0;False;15;FLOAT;0;False;21;FLOAT3;0,0,0;False;25;FLOAT;0;False;29;FLOAT3;0,0,0;False;12;FLOAT;0;False;8;FLOAT3;0,0,0;False;16;FLOAT;0;False;43;FLOAT3;0,0,0;False;47;FLOAT;0;False;51;FLOAT3;0,0,0;False;34;FLOAT;0;False;30;FLOAT3;0,0,0;False;38;FLOAT;0;False;44;FLOAT3;0,0,0;False;48;FLOAT;0;False;52;FLOAT3;0,0,0;False;35;FLOAT;0;False;31;FLOAT3;0,0,0;False;39;FLOAT;0;False;45;FLOAT3;0,0,0;False;49;FLOAT;0;False;53;FLOAT3;0,0,0;False;36;FLOAT;0;False;32;FLOAT3;0,0,0;False;40;FLOAT;0;False;46;FLOAT3;0,0,0;False;50;FLOAT;0;False;54;FLOAT3;0,0,0;False;37;FLOAT;0;False;33;FLOAT3;0,0,0;False;41;FLOAT;0;False;5;FLOAT3;90;COLOR;99;FLOAT;92;FLOAT3;0;FLOAT3;80
 Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;57;-1056,-1136;Inherit;False;Property;_DiffuseColor;Diffuse Color;1;1;[Gamma];Create;True;0;0;0;False;0;False;0,0,0,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;0;576,-80;Float;False;True;-1;6;AmplifyShaderEditor.MaterialInspector;0;0;StandardSpecular;Star Citizen/Layer Blend;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;True;False;Back;0;False;;0;False;;False;0;False;;0;False;;False;0;Opaque;0.02;True;True;0;False;Opaque;;Geometry;ForwardOnly;12;all;True;True;True;True;0;False;;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;2;15;10;25;False;0.5;True;0;0;False;;0;False;;0;0;False;;0;False;;0;False;;0;False;;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;True;Relative;0;;-1;-1;-1;-1;0;False;0;0;False;;-1;0;False;;0;0;0;False;0.1;False;;0;False;;True;17;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;5;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;16;FLOAT4;0,0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;58;-336,-864;Inherit;False;Property;_SpecularColor;Specular Color;4;0;Create;True;0;0;0;True;0;False;0,0,0,1;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;0;576,-80;Float;False;True;-1;6;AmplifyShaderEditor.MaterialInspector;0;0;StandardSpecular;Star Citizen/Layer Blend;False;False;False;False;False;False;False;False;False;False;True;False;False;False;False;False;False;False;True;True;False;Back;0;False;;0;False;;False;0;False;;0;False;;False;0;Opaque;0.02;True;True;0;False;Opaque;;Geometry;ForwardOnly;12;all;True;True;True;True;0;False;;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;2;15;10;25;False;0.5;True;0;0;False;;0;False;;0;0;False;;0;False;;0;False;;0;False;;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;True;Relative;0;;-1;-1;-1;-1;0;False;0;0;False;;-1;0;False;;0;0;0;False;0.1;False;;0;False;;True;17;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;5;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;16;FLOAT4;0,0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;95;0;1;0
 WireConnection;8;0;95;0
 WireConnection;9;9;3;0
@@ -868,4 +870,4 @@ WireConnection;0;3;110;80
 WireConnection;0;4;110;92
 WireConnection;0;6;106;0
 ASEEND*/
-//CHKSM=DB9BCDC25D3620D1C4C247B154AC69C04ACC29D3
+//CHKSM=0FA6D1A4852A7BC7345AD3E1F468C9C036FF5E9C

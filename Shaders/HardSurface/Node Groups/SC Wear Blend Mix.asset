@@ -25,9 +25,9 @@ MonoBehaviour:
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;8;-496,0;Inherit;False;Wear
     Blend Base;1;2;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode,
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;9;64,-144;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.Compare,
-    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;5;-64,144;Inherit;False;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput,
+    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;5;-64,144;Inherit;False;2;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput,
     AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;0;256,-144;Inherit;False;True;-1;Mask;0;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput,
-    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;4;128,144;Inherit;False;False;-1;Displacement;1;False;1;0;FLOAT;0;False;1;FLOAT;0\nWireConnection;2;0;1;0\nWireConnection;2;1;8;0\nWireConnection;3;0;2;0\nWireConnection;9;0;3;0\nWireConnection;9;1;6;0\nWireConnection;5;0;7;0\nWireConnection;5;1;6;0\nWireConnection;0;0;9;0\nWireConnection;4;0;5;0\nASEEND*/\n//CHKSM=96280F8987E17E04C81CC30C2DA45FEA0A4553E0"
+    AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;4;128,144;Inherit;False;False;-1;Displacement;1;False;1;0;FLOAT;0;False;1;FLOAT;0\nWireConnection;2;0;1;0\nWireConnection;2;1;8;0\nWireConnection;3;0;2;0\nWireConnection;9;0;3;0\nWireConnection;9;1;6;0\nWireConnection;5;0;7;0\nWireConnection;5;1;6;0\nWireConnection;0;0;9;0\nWireConnection;4;0;5;0\nASEEND*/\n//CHKSM=7A711107AAF10B26CC6D152717FFC0C7987C3DBA"
   m_functionName: 
   m_description: 
   m_additionalIncludes:

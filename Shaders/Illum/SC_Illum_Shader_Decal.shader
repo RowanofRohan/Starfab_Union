@@ -29,8 +29,9 @@ Shader "Star Citizen/Illum (No Shadows)"
 		_UseAlpha( "Use Alpha", Float ) = 0
 		_DetailDiffuseScale( "Detail Diffuse Scale", Float ) = 0
 		_DetailGlossScale( "Detail Gloss Scale", Float ) = 0
-		[HideInInspector] GenKey__Diffuse( "Assign keyword _DIFFUSE", Float ) = 1.0
+		_Emission( "_Emission", Color ) = ( 0, 0, 0, 0 )
 		[HideInInspector] GenKey__Blend( "Assign keyword _BLEND", Float ) = 1.0
+		[HideInInspector] GenKey__Diffuse( "Assign keyword _DIFFUSE", Float ) = 1.0
 		[HideInInspector] GenKey__Detail( "Assign keyword _DETAIL", Float ) = 1.0
 		[HideInInspector] GenKey__Decal( "Assign keyword _DECAL", Float ) = 1.0
 		[HideInInspector] GenKey__ddna( "Assign keyword _DDNA", Float ) = 1.0
@@ -73,6 +74,7 @@ Shader "Star Citizen/Illum (No Shadows)"
 			float4 vertexColor : COLOR;
 		};
 
+		uniform float4 _Emission;
 		uniform float4 _DDNAColor;
 		uniform sampler2D _ddna;
 		uniform float4 _ddna_ST;
@@ -318,7 +320,7 @@ Node;AmplifyShaderEditor.StaticSwitch, AmplifyShaderEditor, Version=0.0.0.0, Cul
 Node;AmplifyShaderEditor.RangedFloatNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;56;-1136,208;Inherit;False;Property;_MetalTweak;Metal Tweak;24;0;Create;True;0;0;0;False;0;False;0;0;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.FunctionNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;141;-592,0;Inherit;False;SC Illum;1;;61261;b8f56813ea575f54dae41b63a9c1c583;1,234,1;26;257;COLOR;0,0,0,0;False;152;COLOR;0,0,0,0;False;142;COLOR;0,0,0,0;False;2;COLOR;0,0,0,1;False;18;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT;0;False;7;COLOR;0,0,0,0;False;8;COLOR;0,0,0,0;False;13;COLOR;0,0,0,0;False;14;COLOR;0,0,0,0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;COLOR;0,0,0,0;False;20;COLOR;0,0,0,0;False;21;FLOAT;0;False;22;COLOR;0,0,0,0;False;23;FLOAT;0;False;24;FLOAT;0;False;25;FLOAT;0;False;27;FLOAT;0;False;28;FLOAT;0;False;29;FLOAT;0;False;30;FLOAT;0;False;31;FLOAT;0;False;32;FLOAT;0;False;7;COLOR;176;FLOAT3;178;FLOAT3;180;FLOAT;160;FLOAT3;164;COLOR;154;COLOR;0
 Node;AmplifyShaderEditor.RangedFloatNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;48;-1472,1472;Inherit;False;Property;_HeightBias;Height Bias;28;0;Create;True;0;0;0;False;0;False;0.5;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;142;-847.8647,1087.118;Inherit;False;Property;_Emission;_Emission;33;0;Create;True;0;0;0;False;0;False;0,0,0,0;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
+Node;AmplifyShaderEditor.ColorNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;142;-847.8647,1087.118;Inherit;False;Property;_Emission;_Emission;33;0;Create;True;0;0;0;True;0;False;0,0,0,0;0,0,0,0;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.StandardSurfaceOutputNode, AmplifyShaderEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null;27;0,0;Float;False;True;-1;6;AmplifyShaderEditor.MaterialInspector;0;0;StandardSpecular;Star Citizen/Illum (No Shadows);False;False;False;False;False;False;False;False;False;False;True;False;False;False;False;False;False;False;True;True;False;Back;0;False;;0;False;;False;0;False;;0;False;;False;0;Custom;0.5;True;False;0;True;Transparent;;Geometry;All;12;all;True;True;True;True;0;False;;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;2;15;10;25;False;0.5;True;0;0;False;;0;False;;0;0;False;;0;False;;0;False;;0;False;;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;True;Relative;0;;32;-1;-1;-1;0;True;0;0;False;;-1;0;False;;0;0;0;False;0.1;False;;0;False;;False;17;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;5;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;16;FLOAT4;0,0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;137;2;33;0
 WireConnection;137;3;115;0
@@ -365,4 +367,4 @@ WireConnection;27;3;141;180
 WireConnection;27;4;141;178
 WireConnection;27;9;141;160
 ASEEND*/
-//CHKSM=EC45121C6A70B3FE250225D61B33638C6612626B
+//CHKSM=31D02C09F8D55C7A509399373BDC89FCF61D1AAF
